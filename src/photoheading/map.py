@@ -1,0 +1,43 @@
+"""Define the Map class."""
+
+from PIL import Image
+from PIL import ImageDraw
+from matplotlib.pyplot import imshow
+import rasterio
+from rasterio.plot import show
+
+from keenepyt.core.thing import Thing
+
+class Map(Thing):
+    """Represents a map that uses a georeferenced image as a basemap."""
+
+    def __init__(self, source, helpers=None, **kwargs) -> None:
+        super().__init__(helpers, **kwargs)
+
+        self.source = source
+
+        with rasterio.open(source) as dataset:
+            self.bounds = dataset.bounds
+            self.crs = dataset.crs
+            self.res = dataset.res
+        
+        self.image = Image.open(source).convert('RGBA')
+
+    def draw_circle(self, x, y, r=10, fill='red', outline='black'):
+        draw = ImageDraw.Draw(self.image)
+        x_paper, y_paper = self.get_paper_coords(x, y)
+        xy = (x_paper - r, y_paper - r, x_paper + r, y_paper + r)
+        draw.ellipse(xy, fill, outline)
+        # draw.ellipse((1000, 750, 1020, 770), fill, outline)
+
+    def get_paper_coords(self, x, y):
+        x_out = (x - self.bounds[0]) / self.res[0]
+        y_out = (self.bounds[3] - y) / self.res[1]
+        return x_out, y_out
+
+    def show_map(self):
+        imshow(self.image)
+
+    def show_basemap(self):
+        with rasterio.open(self.source) as dataset:
+            show(dataset.read(), transform=dataset.transform)
