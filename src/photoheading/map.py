@@ -23,7 +23,13 @@ class Map(Thing):
         
         self.image = Image.open(source).convert('RGBA')
 
-    def draw_circle(self, x, y, r=10, fill='red', outline='black'):
+    def crop(self, xmin, ymin, xmax, ymax):
+        left, top = self.get_paper_coords(xmin, ymax)
+        right, bottom = self.get_paper_coords(xmax, ymin)
+        self.image = self.image.crop((left, top, right, bottom))
+        self.bounds = (xmin, ymin, xmax, ymax)
+
+    def draw_circle(self, x, y, r=2, fill='red', outline='black'):
         draw = ImageDraw.Draw(self.image)
         x_paper, y_paper = self.get_paper_coords(x, y)
         xy = (x_paper - r, y_paper - r, x_paper + r, y_paper + r)
