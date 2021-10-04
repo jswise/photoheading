@@ -41,9 +41,25 @@ class Map(Thing):
         y_out = (self.bounds[3] - y) / self.res[1]
         return x_out, y_out
 
+    def reres(self, factor):
+        """Increase the resolution of the image by the specified factor.
+        
+        :param factor: An integer by which to multiply the number of pixels.
+        """
+
+        new_width = self.image.width * factor
+        new_height = self.image.height * factor
+        self.res = (self.res[0] / factor, self.res[1] / factor)
+
+        self.image = self.image.resize((new_width, new_height))
+
     def show_map(self):
         imshow(self.image)
 
     def show_basemap(self):
         with rasterio.open(self.source) as dataset:
             show(dataset.read(), transform=dataset.transform)
+    
+    def write(self, path):
+        rgb = self.image.convert('RGB')
+        rgb.save(path)
