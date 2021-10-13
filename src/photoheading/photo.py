@@ -37,14 +37,10 @@ class Photo(Thing):
         import pyproj
         
         wgs84 = pycrs.parse.from_epsg_code(4326).to_proj4()
-        # output_crs = pycrs.parse.from_epsg_code(epsg).to_proj4()
         output_crs = '+proj=utm +zone=19 +ellps=GRS80 +units=m +no_defs'
 
         fromproj = pyproj.Proj(wgs84)
         toproj = pyproj.Proj(output_crs)
-
-        # if len(coords) == 2:
-        #     coords[2] = 0
 
         return pyproj.transform(fromproj, toproj, coords[0], coords[1])
 

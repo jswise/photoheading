@@ -34,7 +34,13 @@ class Map(Thing):
         x_paper, y_paper = self.get_paper_coords(x, y)
         xy = (x_paper - r, y_paper - r, x_paper + r, y_paper + r)
         draw.ellipse(xy, fill, outline)
-        # draw.ellipse((1000, 750, 1020, 770), fill, outline)
+
+    def draw_line(self, x1, y1, x2, y2, fill='red', width=2):
+        draw = ImageDraw.Draw(self.image)
+        x1_paper, y1_paper = self.get_paper_coords(x1, y1)
+        x2_paper, y2_paper = self.get_paper_coords(x2, y2)
+        xy = [x1_paper, y1_paper, x2_paper, y2_paper]
+        draw.line(xy, fill, width)
 
     def get_paper_coords(self, x, y):
         x_out = (x - self.bounds[0]) / self.res[0]
