@@ -78,15 +78,17 @@ def get_course(x, y, prev_x, prev_y):
         return int(270 - atan_deg)
 
 def build_photo_table(photo_folder):
-    
+    spacing = 3
     photos = list(photo_folder.glob('*.*'))
-    photo_count = len(photos)
+    photo_count = int(len(photos) / spacing)
     df = pd.DataFrame()
     prev_x = None
     prev_y = None
     i = 0
     for photo_file in photos:
         i += 1
+        if i % spacing > 0:
+            continue
         percent = int((i / photo_count) * 100)
         print('Processing {} of {} ({}%).'.format(i, photo_count, percent))
         drone_photo = Photo(photo_file)
@@ -130,12 +132,17 @@ rgb = white.convert('RGB')
 rgb.save(data_folder / 'output' / 'TestPhoto.jpg')
 
 # photo_folder = data_folder / 'input' / 'photos01'
-photo_folder = pathlib.Path(r'C:\YCEMA\20210522\Subset01')
-# photo_folder = pathlib.Path(r'C:\YCEMA\20210522\Yellow01')
+# photo_folder = pathlib.Path(r'C:\Personal\YCEMA\20210522\Subset01')
+photo_folder = pathlib.Path(r'C:\Personal\YCEMA\20210522\Yellow01')
 photo_table = build_photo_table(photo_folder)
+northeast = (photo_table['Course'] > 25) & (photo_table['Course'] < 50)
+photo_table.loc[northeast, 'MeanCourse'] = photo_table[northeast]['Course'].mean()
+southwest = (photo_table['Course'] > 110) & (photo_table['Course'] < 230)
+# photo_table.loc[southwest, 'MeanCourse'] = photo_table[southwest]['Course'].mean()
+photo_table.loc[southwest, 'MeanCourse'] = -1
 print(photo_table[['X', 'Y', 'PrevX', 'PrevY', 'Course', 'MeanCourse']])
-# crab = -6
-crab = 0
+crab = 6
+# crab = 0
 photo_count = len(photo_table)
 i = 0
 paper_coords = []
@@ -168,15 +175,15 @@ for _, row in photo_table.iterrows():
     map.image.paste(small_photo, (int(corner_x), int(corner_y)), small_photo)
     # map.image.alpha_composite(small_photo)
 
-prev_x = None
-prev_y = None
-for _, row in photo_table.iterrows():
-    if prev_x:
-        map.draw_line(prev_x, prev_y, row['X'], row['Y'], width=4)
-    prev_x = row['X']
-    prev_y = row['Y']
-for _, row in photo_table.iterrows():
-    map.draw_circle(row['X'], row['Y'], 6, 'yellow')
+# prev_x = None
+# prev_y = None
+# for _, row in photo_table.iterrows():
+#     if prev_x:
+#         map.draw_line(prev_x, prev_y, row['X'], row['Y'], width=4)
+#     prev_x = row['X']
+#     prev_y = row['Y']
+# for _, row in photo_table.iterrows():
+#     map.draw_circle(row['X'], row['Y'], 6, 'yellow')
 
 xmin = photo_table['X'].min()
 xmax = photo_table['X'].max()
