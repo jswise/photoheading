@@ -20,4 +20,4 @@ def test_get_coordinates(victim):
     assert result[0] == -70.78108716666667
 
     result = victim.get_coordinates(6348)
-    assert result[0] == 5698047.219041451
+    assert result[0] == 355916.28706444637
